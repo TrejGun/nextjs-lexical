@@ -1,0 +1,4 @@
+{
+  "baseBranches": ["master"],
+  "extends": ["github>екуопгт/renovate-config"]
+}
