@@ -1,4 +1,4 @@
 {
   "baseBranches": ["master"],
-  "extends": ["github>екуопгт/renovate-config"]
+  "extends": ["github>trejgun/renovate-config"]
 }
