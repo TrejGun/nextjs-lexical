@@ -6,15 +6,13 @@
  *
  */
 
-import type {JSX} from 'react';
+import type { JSX } from "react";
+import { HTMLInputTypeAttribute } from "react";
 
-import './Input.css';
-
-import * as React from 'react';
-import {HTMLInputTypeAttribute} from 'react';
+import "./Input.css";
 
 type Props = Readonly<{
-  'data-test-id'?: string;
+  "data-test-id"?: string;
   label: string;
   onChange: (val: string) => void;
   placeholder?: string;
@@ -23,13 +21,13 @@ type Props = Readonly<{
 }>;
 
 export default function TextInput({
-  label,
-  value,
-  onChange,
-  placeholder = '',
-  'data-test-id': dataTestId,
-  type = 'text',
-}: Props): JSX.Element {
+                                    label,
+                                    value,
+                                    onChange,
+                                    placeholder = "",
+                                    "data-test-id": dataTestId,
+                                    type = "text",
+                                  }: Props): JSX.Element {
   return (
     <div className="Input__wrapper">
       <label className="Input__label">{label}</label>

@@ -6,21 +6,19 @@
  *
  */
 
-import type {JSX} from 'react';
+import type { JSX } from "react";
+import { ReactNode, useEffect, useRef } from "react";
+import { isDOMNode } from "lexical";
+import { createPortal } from "react-dom";
 
-import './Modal.css';
-
-import {isDOMNode} from 'lexical';
-import * as React from 'react';
-import {ReactNode, useEffect, useRef} from 'react';
-import {createPortal} from 'react-dom';
+import "./Modal.css";
 
 function PortalImpl({
-  onClose,
-  children,
-  title,
-  closeOnClickOutside,
-}: {
+                      onClose,
+                      children,
+                      title,
+                      closeOnClickOutside,
+                    }: {
   children: ReactNode;
   closeOnClickOutside: boolean;
   onClose: () => void;
@@ -37,7 +35,7 @@ function PortalImpl({
   useEffect(() => {
     let modalOverlayElement: HTMLElement | null = null;
     const handler = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         onClose();
       }
     };
@@ -56,16 +54,16 @@ function PortalImpl({
     if (modelElement !== null) {
       modalOverlayElement = modelElement.parentElement;
       if (modalOverlayElement !== null) {
-        modalOverlayElement.addEventListener('click', clickOutsideHandler);
+        modalOverlayElement.addEventListener("click", clickOutsideHandler);
       }
     }
 
-    window.addEventListener('keydown', handler);
+    window.addEventListener("keydown", handler);
 
     return () => {
-      window.removeEventListener('keydown', handler);
+      window.removeEventListener("keydown", handler);
       if (modalOverlayElement !== null) {
-        modalOverlayElement?.removeEventListener('click', clickOutsideHandler);
+        modalOverlayElement?.removeEventListener("click", clickOutsideHandler);
       }
     };
   }, [closeOnClickOutside, onClose]);
@@ -88,11 +86,11 @@ function PortalImpl({
 }
 
 export default function Modal({
-  onClose,
-  children,
-  title,
-  closeOnClickOutside = false,
-}: {
+                                onClose,
+                                children,
+                                title,
+                                closeOnClickOutside = false,
+                              }: {
   children: ReactNode;
   closeOnClickOutside?: boolean;
   onClose: () => void;

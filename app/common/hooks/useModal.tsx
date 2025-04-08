@@ -29,7 +29,6 @@ export default function useModal() {
   const showModal = useCallback(
     (
       title: string,
-       
       getContent: (fn: () => void) => string,
     ) => {
       setModalContent({

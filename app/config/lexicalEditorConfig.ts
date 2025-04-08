@@ -1,7 +1,7 @@
 import { AutoLinkNode, LinkNode } from "@lexical/link";
 import { HeadingNode, QuoteNode } from "@lexical/rich-text";
 import { CodeHighlightNode, CodeNode } from "@lexical/code";
-import { ListNode, ListItemNode } from "@lexical/list";
+import { ListItemNode, ListNode } from "@lexical/list";
 
 import lexicalEditorTheme from "./lexicalEditorTheme";
 

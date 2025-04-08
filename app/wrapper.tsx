@@ -2,9 +2,11 @@
 
 import dynamic from "next/dynamic";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
+
 import { ToolbarContext } from "./editor/context/ToolbarContext";
 import { SharedHistoryContext } from "./editor/context/SharedHistoryContext";
 import PlaygroundNodes from "./editor/nodes/PlaygroundNodes";
+import PlaygroundEditorTheme from "./editor/themes/PlaygroundEditorTheme";
 
 import "./editor/index.css";
 
@@ -20,6 +22,7 @@ export default function Wrapper() {
         onError: (error: Error) => {
           throw error;
         },
+        theme: PlaygroundEditorTheme,
       }}
     >
       <SharedHistoryContext>

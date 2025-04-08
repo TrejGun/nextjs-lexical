@@ -13,7 +13,6 @@ import {
   FormatListNumbered,
   FormatQuote,
   FormatUnderlinedOutlined,
-  // InsertLinkOutlined,
   RedoOutlined,
   StrikethroughSOutlined,
   TextFields,

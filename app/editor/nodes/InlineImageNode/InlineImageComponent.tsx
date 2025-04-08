@@ -5,20 +5,9 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
-import type {Position} from './InlineImageNode';
-import type {BaseSelection, LexicalEditor, NodeKey} from 'lexical';
-import type {JSX} from 'react';
-
-import './InlineImageNode.css';
-
-import {AutoFocusPlugin} from '@lexical/react/LexicalAutoFocusPlugin';
-import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {LexicalErrorBoundary} from '@lexical/react/LexicalErrorBoundary';
-import {LexicalNestedComposer} from '@lexical/react/LexicalNestedComposer';
-import {RichTextPlugin} from '@lexical/react/LexicalRichTextPlugin';
-import {useLexicalEditable} from '@lexical/react/useLexicalEditable';
-import {useLexicalNodeSelection} from '@lexical/react/useLexicalNodeSelection';
-import {mergeRegister} from '@lexical/utils';
+import type { Position } from "./InlineImageNode";
+import { InlineImageNode } from "./InlineImageNode";
+import type { BaseSelection, LexicalEditor, NodeKey } from "lexical";
 import {
   $getNodeByKey,
   $getSelection,
@@ -30,18 +19,28 @@ import {
   KEY_ENTER_COMMAND,
   KEY_ESCAPE_COMMAND,
   SELECTION_CHANGE_COMMAND,
-} from 'lexical';
-import * as React from 'react';
-import {Suspense, useCallback, useEffect, useRef, useState} from 'react';
+} from "lexical";
+import type { JSX, ChangeEvent } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 
-import useModal from '../../hooks/useModal';
-import LinkPlugin from '../../plugins/LinkPlugin';
-import Button from '../../ui/Button';
-import ContentEditable from '../../ui/ContentEditable';
-import {DialogActions} from '../../ui/Dialog';
-import Select from '../../ui/Select';
-import TextInput from '../../ui/TextInput';
-import {InlineImageNode} from './InlineImageNode';
+import "./InlineImageNode.css";
+
+import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
+import { LexicalNestedComposer } from "@lexical/react/LexicalNestedComposer";
+import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { useLexicalEditable } from "@lexical/react/useLexicalEditable";
+import { useLexicalNodeSelection } from "@lexical/react/useLexicalNodeSelection";
+import { mergeRegister } from "@lexical/utils";
+
+import useModal from "../../hooks/useModal";
+import LinkPlugin from "../../plugins/LinkPlugin";
+import Button from "../../ui/Button";
+import ContentEditable from "../../ui/ContentEditable";
+import { DialogActions } from "../../ui/Dialog";
+import Select from "../../ui/Select";
+import TextInput from "../../ui/TextInput";
 
 const imageCache = new Set();
 
@@ -59,20 +58,20 @@ function useSuspenseImage(src: string) {
 }
 
 function LazyImage({
-  altText,
-  className,
-  imageRef,
-  src,
-  width,
-  height,
-  position,
-}: {
+                     altText,
+                     className,
+                     imageRef,
+                     src,
+                     width,
+                     height,
+                     position,
+                   }: {
   altText: string;
   className: string | null;
-  height: 'inherit' | number;
-  imageRef: {current: null | HTMLImageElement};
+  height: "inherit" | number;
+  imageRef: { current: null | HTMLImageElement };
   src: string;
-  width: 'inherit' | number;
+  width: "inherit" | number;
   position: Position;
 }): JSX.Element {
   useSuspenseImage(src);
@@ -84,7 +83,7 @@ function LazyImage({
       ref={imageRef}
       data-position={position}
       style={{
-        display: 'block',
+        display: "block",
         height,
         width,
       }}
@@ -94,10 +93,10 @@ function LazyImage({
 }
 
 export function UpdateInlineImageDialog({
-  activeEditor,
-  nodeKey,
-  onClose,
-}: {
+                                          activeEditor,
+                                          nodeKey,
+                                          onClose,
+                                        }: {
   activeEditor: LexicalEditor;
   nodeKey: NodeKey;
   onClose: () => void;
@@ -110,16 +109,16 @@ export function UpdateInlineImageDialog({
   const [showCaption, setShowCaption] = useState(node.getShowCaption());
   const [position, setPosition] = useState<Position>(node.getPosition());
 
-  const handleShowCaptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleShowCaptionChange = (e: ChangeEvent<HTMLInputElement>) => {
     setShowCaption(e.target.checked);
   };
 
-  const handlePositionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handlePositionChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setPosition(e.target.value as Position);
   };
 
   const handleOnConfirm = () => {
-    const payload = {altText, position, showCaption};
+    const payload = { altText, position, showCaption };
     if (node) {
       activeEditor.update(() => {
         node.update(payload);
@@ -130,7 +129,7 @@ export function UpdateInlineImageDialog({
 
   return (
     <>
-      <div style={{marginBottom: '1em'}}>
+      <div style={{ marginBottom: "1em" }}>
         <TextInput
           label="Alt Text"
           placeholder="Descriptive alternative text"
@@ -141,7 +140,7 @@ export function UpdateInlineImageDialog({
       </div>
 
       <Select
-        style={{marginBottom: '1em', width: '208px'}}
+        style={{ marginBottom: "1em", width: "208px" }}
         value={position}
         label="Position"
         name="position"
@@ -174,22 +173,22 @@ export function UpdateInlineImageDialog({
 }
 
 export default function InlineImageComponent({
-  src,
-  altText,
-  nodeKey,
-  width,
-  height,
-  showCaption,
-  caption,
-  position,
-}: {
+                                               src,
+                                               altText,
+                                               nodeKey,
+                                               width,
+                                               height,
+                                               showCaption,
+                                               caption,
+                                               position,
+                                             }: {
   altText: string;
   caption: LexicalEditor;
-  height: 'inherit' | number;
+  height: "inherit" | number;
   nodeKey: NodeKey;
   showCaption: boolean;
   src: string;
-  width: 'inherit' | number;
+  width: "inherit" | number;
   position: Position;
 }): JSX.Element {
   const [modal, showModal] = useModal();
@@ -255,7 +254,7 @@ export default function InlineImageComponent({
   useEffect(() => {
     let isMounted = true;
     const unregister = mergeRegister(
-      editor.registerUpdateListener(({editorState}) => {
+      editor.registerUpdateListener(({ editorState }) => {
         if (isMounted) {
           setSelection(editorState.read(() => $getSelection()));
         }
@@ -331,7 +330,7 @@ export default function InlineImageComponent({
               className="image-edit-button"
               ref={buttonRef}
               onClick={() => {
-                showModal('Update Inline Image', (onClose) => (
+                showModal("Update Inline Image", (onClose) => (
                   <UpdateInlineImageDialog
                     activeEditor={editor}
                     nodeKey={nodeKey}
@@ -345,7 +344,7 @@ export default function InlineImageComponent({
           <LazyImage
             className={
               isFocused
-                ? `focused ${$isNodeSelection(selection) ? 'draggable' : ''}`
+                ? `focused ${$isNodeSelection(selection) ? "draggable" : ""}`
                 : null
             }
             src={src}

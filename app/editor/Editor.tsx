@@ -7,7 +7,6 @@
  */
 
 import type { JSX } from "react";
-import * as React from "react";
 import { useEffect, useState } from "react";
 
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
@@ -43,7 +42,7 @@ import ToolbarPlugin from "./plugins/ToolbarPlugin";
 import ContentEditable from "./ui/ContentEditable";
 
 export default function Editor(): JSX.Element {
-  const {historyState} = useSharedHistoryContext();
+  const { historyState } = useSharedHistoryContext();
   const isEditable = useLexicalEditable();
   const placeholder = "Enter some rich text...";
   const [floatingAnchorElem, setFloatingAnchorElem] =
@@ -63,32 +62,32 @@ export default function Editor(): JSX.Element {
   useEffect(() => {
     const updateViewPortWidth = () => {
       const isNextSmallWidthViewport =
-        CAN_USE_DOM && window.matchMedia('(max-width: 1025px)').matches;
+        CAN_USE_DOM && window.matchMedia("(max-width: 1025px)").matches;
 
       if (isNextSmallWidthViewport !== isSmallWidthViewport) {
         setIsSmallWidthViewport(isNextSmallWidthViewport);
       }
     };
     updateViewPortWidth();
-    window.addEventListener('resize', updateViewPortWidth);
+    window.addEventListener("resize", updateViewPortWidth);
 
     return () => {
-      window.removeEventListener('resize', updateViewPortWidth);
+      window.removeEventListener("resize", updateViewPortWidth);
     };
   }, [isSmallWidthViewport]);
 
   return (
     <>
-        <ToolbarPlugin
-          editor={editor}
-          activeEditor={activeEditor}
-          setActiveEditor={setActiveEditor}
-          setIsLinkEditMode={setIsLinkEditMode}
-        />
-        <ShortcutsPlugin
-          editor={activeEditor}
-          setIsLinkEditMode={setIsLinkEditMode}
-        />
+      <ToolbarPlugin
+        editor={editor}
+        activeEditor={activeEditor}
+        setActiveEditor={setActiveEditor}
+        setIsLinkEditMode={setIsLinkEditMode}
+      />
+      <ShortcutsPlugin
+        editor={activeEditor}
+        setIsLinkEditMode={setIsLinkEditMode}
+      />
       <div
         className={`editor-container`}>
         <MaxLengthPlugin maxLength={30} />
@@ -97,54 +96,54 @@ export default function Editor(): JSX.Element {
         <ComponentPickerPlugin />
         <AutoLinkPlugin />
         <HistoryPlugin externalHistoryState={historyState} />
-            <RichTextPlugin
-              contentEditable={
-                <div className="editor-scroller">
-                  <div className="editor" ref={onRef}>
-                    <ContentEditable placeholder={placeholder} />
-                  </div>
-                </div>
-              }
-              ErrorBoundary={LexicalErrorBoundary}
-            />
-            <MarkdownShortcutPlugin />
-            <CodeHighlightPlugin />
-            <ListPlugin />
-            <CheckListPlugin />
-            <TablePlugin
-              hasCellMerge={false}
-              hasCellBackgroundColor={false}
-              hasHorizontalScroll={true}
-            />
-            <TableCellResizer />
-            <ImagesPlugin />
+        <RichTextPlugin
+          contentEditable={
+            <div className="editor-scroller">
+              <div className="editor" ref={onRef}>
+                <ContentEditable placeholder={placeholder} />
+              </div>
+            </div>
+          }
+          ErrorBoundary={LexicalErrorBoundary}
+        />
+        <MarkdownShortcutPlugin />
+        <CodeHighlightPlugin />
+        <ListPlugin />
+        <CheckListPlugin />
+        <TablePlugin
+          hasCellMerge={false}
+          hasCellBackgroundColor={false}
+          hasHorizontalScroll={true}
+        />
+        <TableCellResizer />
+        <ImagesPlugin />
         <LinkPlugin />
-            <ClickableLinkPlugin disabled={isEditable} />
-            <HorizontalRulePlugin />
-            <TabIndentationPlugin maxIndent={7} />
-            {floatingAnchorElem && (
-              <>
-                <FloatingLinkEditorPlugin
-                  anchorElem={floatingAnchorElem}
-                  isLinkEditMode={isLinkEditMode}
-                  setIsLinkEditMode={setIsLinkEditMode}
-                />
-                <TableCellActionMenuPlugin
-                  anchorElem={floatingAnchorElem}
-                  cellMerge={true}
-                />
-              </>
-            )}
-            {floatingAnchorElem && !isSmallWidthViewport && (
-              <>
-                <CodeActionMenuPlugin anchorElem={floatingAnchorElem} />
-                <TableHoverActionsPlugin anchorElem={floatingAnchorElem} />
-                <FloatingTextFormatToolbarPlugin
-                  anchorElem={floatingAnchorElem}
-                  setIsLinkEditMode={setIsLinkEditMode}
-                />
-              </>
-            )}
+        <ClickableLinkPlugin disabled={isEditable} />
+        <HorizontalRulePlugin />
+        <TabIndentationPlugin maxIndent={7} />
+        {floatingAnchorElem && (
+          <>
+            <FloatingLinkEditorPlugin
+              anchorElem={floatingAnchorElem}
+              isLinkEditMode={isLinkEditMode}
+              setIsLinkEditMode={setIsLinkEditMode}
+            />
+            <TableCellActionMenuPlugin
+              anchorElem={floatingAnchorElem}
+              cellMerge={true}
+            />
+          </>
+        )}
+        {floatingAnchorElem && !isSmallWidthViewport && (
+          <>
+            <CodeActionMenuPlugin anchorElem={floatingAnchorElem} />
+            <TableHoverActionsPlugin anchorElem={floatingAnchorElem} />
+            <FloatingTextFormatToolbarPlugin
+              anchorElem={floatingAnchorElem}
+              setIsLinkEditMode={setIsLinkEditMode}
+            />
+          </>
+        )}
       </div>
     </>
   );

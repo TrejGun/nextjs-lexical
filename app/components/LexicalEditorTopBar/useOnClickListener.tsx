@@ -19,17 +19,9 @@ import {
   ListNode,
   REMOVE_LIST_COMMAND,
 } from "@lexical/list";
-import {
-  $createHeadingNode,
-  $createQuoteNode,
-  $isHeadingNode,
-} from "@lexical/rich-text";
+import { $createHeadingNode, $createQuoteNode, $isHeadingNode } from "@lexical/rich-text";
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from "@lexical/link";
-import {
-  $isAtNodeEnd,
-  $isParentElementRTL,
-  $wrapNodes,
-} from "@lexical/selection";
+import { $isAtNodeEnd, $isParentElementRTL, $wrapNodes } from "@lexical/selection";
 
 import { eventTypes } from "./toolbarIconsList";
 import useModal from "../../common/hooks/useModal";

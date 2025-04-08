@@ -6,11 +6,20 @@
  *
  */
 
-import type {ElementNode, LexicalEditor} from 'lexical';
-import type {JSX} from 'react';
+import {
+  $getSelection,
+  $isRangeSelection,
+  $setSelection,
+  COMMAND_PRIORITY_CRITICAL,
+  getDOMSelection,
+  isDOMNode,
+  SELECTION_CHANGE_COMMAND,
+} from "lexical";
+import type { JSX } from "react";
+import { ReactPortal, useCallback, useEffect, useRef, useState } from "react";
 
-import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {useLexicalEditable} from '@lexical/react/useLexicalEditable';
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { useLexicalEditable } from "@lexical/react/useLexicalEditable";
 import {
   $computeTableMapSkipCellCheck,
   $deleteTableColumnAtSelection,
@@ -24,95 +33,30 @@ import {
   $insertTableRowAtSelection,
   $isTableCellNode,
   $isTableSelection,
-  $mergeCells,
-  $unmergeCell,
   getTableElement,
   getTableObserverFromTableElement,
   TableCellHeaderStates,
   TableCellNode,
   TableObserver,
-  TableSelection,
-} from '@lexical/table';
-import {mergeRegister} from '@lexical/utils';
-import {
-  $getSelection,
-  $isElementNode,
-  $isRangeSelection,
-  $isTextNode,
-  $setSelection,
-  COMMAND_PRIORITY_CRITICAL,
-  getDOMSelection,
-  isDOMNode,
-  SELECTION_CHANGE_COMMAND,
-} from 'lexical';
-import * as React from 'react';
-import {ReactPortal, useCallback, useEffect, useRef, useState} from 'react';
-import {createPortal} from 'react-dom';
+} from "@lexical/table";
+import { mergeRegister } from "@lexical/utils";
+import { createPortal } from "react-dom";
+import DropDown, { DropDownItem } from "../../ui/DropDown";
 
-import useModal from '../../hooks/useModal';
-import DropDown, {DropDownItem} from '../../ui/DropDown';
-
-function computeSelectionCount(selection: TableSelection): {
-  columns: number;
-  rows: number;
-} {
-  const selectionShape = selection.getShape();
-  return {
-    columns: selectionShape.toX - selectionShape.fromX + 1,
-    rows: selectionShape.toY - selectionShape.fromY + 1,
-  };
-}
-
-function $canUnmerge(): boolean {
-  const selection = $getSelection();
-  if (
-    ($isRangeSelection(selection) && !selection.isCollapsed()) ||
-    ($isTableSelection(selection) && !selection.anchor.is(selection.focus)) ||
-    (!$isRangeSelection(selection) && !$isTableSelection(selection))
-  ) {
-    return false;
-  }
-  const [cell] = $getNodeTriplet(selection.anchor);
-  return cell.__colSpan > 1 || cell.__rowSpan > 1;
-}
-
-function $selectLastDescendant(node: ElementNode): void {
-  const lastDescendant = node.getLastDescendant();
-  if ($isTextNode(lastDescendant)) {
-    lastDescendant.select();
-  } else if ($isElementNode(lastDescendant)) {
-    lastDescendant.selectEnd();
-  } else if (lastDescendant !== null) {
-    lastDescendant.selectNext();
-  }
-}
-
-function currentCellBackgroundColor(editor: LexicalEditor): null | string {
-  return editor.getEditorState().read(() => {
-    const selection = $getSelection();
-    if ($isRangeSelection(selection) || $isTableSelection(selection)) {
-      const [cell] = $getNodeTriplet(selection.anchor);
-      if ($isTableCellNode(cell)) {
-        return cell.getBackgroundColor();
-      }
-    }
-    return null;
-  });
-}
 
 type TableCellActionMenuProps = Readonly<{
-  contextRef: {current: null | HTMLElement};
+  contextRef: { current: null | HTMLElement };
   onClose: () => void;
   setIsMenuOpen: (isOpen: boolean) => void;
   tableCellNode: TableCellNode;
 }>;
 
 function TableActionMenu({
-  onClose,
-  tableCellNode: _tableCellNode,
-  setIsMenuOpen,
-  contextRef,
-}: TableCellActionMenuProps) {
+                           onClose,
+                           tableCellNode: _tableCellNode,
+                           setIsMenuOpen,
+                           contextRef,
+                         }: TableCellActionMenuProps) {
   const [editor] = useLexicalComposerContext();
   const dropDownRef = useRef<HTMLDivElement | null>(null);
   const [tableCellNode, updateTableCellNode] = useState(_tableCellNode);
@@ -120,45 +64,6 @@ function TableActionMenu({
     columns: 1,
     rows: 1,
   });
-  const [canMergeCells, setCanMergeCells] = useState(false);
-  const [canUnmergeCell, setCanUnmergeCell] = useState(false);
-  const [backgroundColor, setBackgroundColor] = useState(
-    () => currentCellBackgroundColor(editor) || '',
-  );
-
-  useEffect(() => {
-    return editor.registerMutationListener(
-      TableCellNode,
-      (nodeMutations) => {
-        const nodeUpdated =
-          nodeMutations.get(tableCellNode.getKey()) === 'updated';
-
-        if (nodeUpdated) {
-          editor.getEditorState().read(() => {
-            updateTableCellNode(tableCellNode.getLatest());
-          });
-          setBackgroundColor(currentCellBackgroundColor(editor) || '');
-        }
-      },
-      {skipInitialization: true},
-    );
-  }, [editor, tableCellNode]);
-
-  useEffect(() => {
-    editor.getEditorState().read(() => {
-      const selection = $getSelection();
-      // Merge cells
-      if ($isTableSelection(selection)) {
-        const currentSelectionCounts = computeSelectionCount(selection);
-        updateSelectionCounts(computeSelectionCount(selection));
-        setCanMergeCells(
-          currentSelectionCounts.columns > 1 || currentSelectionCounts.rows > 1,
-        );
-      }
-      // Unmerge cell
-      setCanUnmergeCell($canUnmerge());
-    });
-  }, [editor]);
 
   useEffect(() => {
     const menuButtonElement = contextRef.current;
@@ -172,7 +77,7 @@ function TableActionMenu({
     ) {
       const rootEleRect = rootElement.getBoundingClientRect();
       const menuButtonRect = menuButtonElement.getBoundingClientRect();
-      dropDownElement.style.opacity = '1';
+      dropDownElement.style.opacity = "1";
       const dropDownElementRect = dropDownElement.getBoundingClientRect();
       const margin = 5;
       let leftPosition = menuButtonRect.right + margin;
@@ -208,9 +113,9 @@ function TableActionMenu({
       }
     }
 
-    window.addEventListener('click', handleClickOutside);
+    window.addEventListener("click", handleClickOutside);
 
-    return () => window.removeEventListener('click', handleClickOutside);
+    return () => window.removeEventListener("click", handleClickOutside);
   }, [setIsMenuOpen, contextRef]);
 
   const clearTableSelection = useCallback(() => {
@@ -224,7 +129,7 @@ function TableActionMenu({
 
         if (tableElement === null) {
           throw new Error(
-            'TableActionMenu: Expected to find tableElement in DOM',
+            "TableActionMenu: Expected to find tableElement in DOM",
           );
         }
 
@@ -239,30 +144,6 @@ function TableActionMenu({
       $setSelection(null);
     });
   }, [editor, tableCellNode]);
-
-  const mergeTableCellsAtSelection = () => {
-    editor.update(() => {
-      const selection = $getSelection();
-      if (!$isTableSelection(selection)) {
-        return;
-      }
-
-      const nodes = selection.getNodes();
-      const tableCells = nodes.filter($isTableCellNode);
-      const targetCell = $mergeCells(tableCells);
-
-      if (targetCell) {
-        $selectLastDescendant(targetCell);
-        onClose();
-      }
-    });
-  };
-
-  const unmergeTableCellsAtSelection = () => {
-    editor.update(() => {
-      $unmergeCell();
-    });
-  };
 
   const insertTableRowAtSelection = useCallback(
     (shouldInsertAfter: boolean) => {
@@ -355,8 +236,8 @@ function TableActionMenu({
       const newStyle =
         tableCellNode.getHeaderStyles() ^ TableCellHeaderStates.COLUMN;
 
-      for (let row = 0; row < gridMap.length; row++) {
-        const mapCell = gridMap[row][tableColumnIndex];
+      for (const item of gridMap) {
+        const mapCell = item[tableColumnIndex];
 
         if (!mapCell?.cell) {
           continue;
@@ -413,32 +294,6 @@ function TableActionMenu({
     });
   }, [editor, tableCellNode, clearTableSelection, onClose]);
 
-  const handleCellBackgroundColor = useCallback(
-    (value: string) => {
-      editor.update(() => {
-        const selection = $getSelection();
-        if ($isRangeSelection(selection) || $isTableSelection(selection)) {
-          const [cell] = $getNodeTriplet(selection.anchor);
-          if ($isTableCellNode(cell)) {
-            cell.setBackgroundColor(value);
-          }
-
-          if ($isTableSelection(selection)) {
-            const nodes = selection.getNodes();
-
-            for (let i = 0; i < nodes.length; i++) {
-              const node = nodes[i];
-              if ($isTableCellNode(node)) {
-                node.setBackgroundColor(value);
-              }
-            }
-          }
-        }
-      });
-    },
-    [editor],
-  );
-
   const formatVerticalAlign = (value: string) => {
     editor.update(() => {
       const selection = $getSelection();
@@ -451,8 +306,7 @@ function TableActionMenu({
         if ($isTableSelection(selection)) {
           const nodes = selection.getNodes();
 
-          for (let i = 0; i < nodes.length; i++) {
-            const node = nodes[i];
+          for (const node of nodes) {
             if ($isTableCellNode(node)) {
               node.setVerticalAlign(value);
             }
@@ -462,10 +316,9 @@ function TableActionMenu({
     });
   };
 
-  let mergeCellButton: null | JSX.Element = null;
+  const mergeCellButton: null | JSX.Element = null;
 
   return createPortal(
-    // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <div
       className="dropdown"
       ref={dropDownRef}
@@ -486,7 +339,7 @@ function TableActionMenu({
         buttonAriaLabel="Formatting options for vertical alignment">
         <DropDownItem
           onClick={() => {
-            formatVerticalAlign('top');
+            formatVerticalAlign("top");
           }}
           className="item wide">
           <div className="icon-text-container">
@@ -496,7 +349,7 @@ function TableActionMenu({
         </DropDownItem>
         <DropDownItem
           onClick={() => {
-            formatVerticalAlign('middle');
+            formatVerticalAlign("middle");
           }}
           className="item wide">
           <div className="icon-text-container">
@@ -506,7 +359,7 @@ function TableActionMenu({
         </DropDownItem>
         <DropDownItem
           onClick={() => {
-            formatVerticalAlign('bottom');
+            formatVerticalAlign("bottom");
           }}
           className="item wide">
           <div className="icon-text-container">
@@ -536,8 +389,8 @@ function TableActionMenu({
         onClick={() => insertTableRowAtSelection(false)}
         data-test-id="table-insert-row-above">
         <span className="text">
-          Insert{' '}
-          {selectionCounts.rows === 1 ? 'row' : `${selectionCounts.rows} rows`}{' '}
+          Insert{" "}
+          {selectionCounts.rows === 1 ? "row" : `${selectionCounts.rows} rows`}{" "}
           above
         </span>
       </button>
@@ -547,8 +400,8 @@ function TableActionMenu({
         onClick={() => insertTableRowAtSelection(true)}
         data-test-id="table-insert-row-below">
         <span className="text">
-          Insert{' '}
-          {selectionCounts.rows === 1 ? 'row' : `${selectionCounts.rows} rows`}{' '}
+          Insert{" "}
+          {selectionCounts.rows === 1 ? "row" : `${selectionCounts.rows} rows`}{" "}
           below
         </span>
       </button>
@@ -559,10 +412,10 @@ function TableActionMenu({
         onClick={() => insertTableColumnAtSelection(false)}
         data-test-id="table-insert-column-before">
         <span className="text">
-          Insert{' '}
+          Insert{" "}
           {selectionCounts.columns === 1
-            ? 'column'
-            : `${selectionCounts.columns} columns`}{' '}
+            ? "column"
+            : `${selectionCounts.columns} columns`}{" "}
           left
         </span>
       </button>
@@ -572,10 +425,10 @@ function TableActionMenu({
         onClick={() => insertTableColumnAtSelection(true)}
         data-test-id="table-insert-column-after">
         <span className="text">
-          Insert{' '}
+          Insert{" "}
           {selectionCounts.columns === 1
-            ? 'column'
-            : `${selectionCounts.columns} columns`}{' '}
+            ? "column"
+            : `${selectionCounts.columns} columns`}{" "}
           right
         </span>
       </button>
@@ -610,8 +463,8 @@ function TableActionMenu({
         <span className="text">
           {(tableCellNode.__headerState & TableCellHeaderStates.ROW) ===
           TableCellHeaderStates.ROW
-            ? 'Remove'
-            : 'Add'}{' '}
+            ? "Remove"
+            : "Add"}{" "}
           row header
         </span>
       </button>
@@ -623,8 +476,8 @@ function TableActionMenu({
         <span className="text">
           {(tableCellNode.__headerState & TableCellHeaderStates.COLUMN) ===
           TableCellHeaderStates.COLUMN
-            ? 'Remove'
-            : 'Add'}{' '}
+            ? "Remove"
+            : "Add"}{" "}
           column header
         </span>
       </button>
@@ -634,8 +487,8 @@ function TableActionMenu({
 }
 
 function TableCellActionMenuContainer({
-  anchorElem,
-}: {
+                                        anchorElem,
+                                      }: {
   anchorElem: HTMLElement;
   cellMerge: boolean;
 }): JSX.Element {
@@ -652,7 +505,7 @@ function TableCellActionMenuContainer({
   const checkTableCellOverflow = useCallback(
     (tableCellParentNodeDOM: HTMLElement): boolean => {
       const scrollableContainer = tableCellParentNodeDOM.closest(
-        '.PlaygroundEditorTheme__tableScrollableWrapper',
+        ".PlaygroundEditorTheme__tableScrollableWrapper",
       );
       if (scrollableContainer) {
         const containerRect = (
@@ -683,10 +536,11 @@ function TableCellActionMenuContainer({
     const selection = $getSelection();
     const nativeSelection = getDOMSelection(editor._window);
     const activeElement = document.activeElement;
+
     function disable() {
       if (menu) {
-        menu.classList.remove('table-cell-action-button-container--active');
-        menu.classList.add('table-cell-action-button-container--inactive');
+        menu.classList.remove("table-cell-action-button-container--active");
+        menu.classList.add("table-cell-action-button-container--inactive");
       }
       setTableMenuCellNode(null);
     }
@@ -738,7 +592,7 @@ function TableCellActionMenuContainer({
 
       if (tableElement === null) {
         throw new Error(
-          'TableActionMenu: Expected to find tableElement in DOM',
+          "TableActionMenu: Expected to find tableElement in DOM",
         );
       }
 
@@ -749,7 +603,7 @@ function TableCellActionMenuContainer({
         selection.anchor.getNode(),
       );
       if (!$isTableCellNode(anchorNode)) {
-        throw new Error('TableSelection anchorNode must be a TableCellNode');
+        throw new Error("TableSelection anchorNode must be a TableCellNode");
       }
       const tableNode = $getTableNodeFromLexicalNodeOrThrow(anchorNode);
       const tableElement = getTableElement(
@@ -758,7 +612,7 @@ function TableCellActionMenuContainer({
       );
       if (tableElement === null) {
         throw new Error(
-          'TableActionMenu: Expected to find tableElement in DOM',
+          "TableActionMenu: Expected to find tableElement in DOM",
         );
       }
       tableObserver = getTableObserverFromTableElement(tableElement);
@@ -777,13 +631,13 @@ function TableCellActionMenuContainer({
     if (tableObserver === null || tableCellParentNodeDOM === null) {
       return disable();
     }
-    const enabled = !tableObserver || !tableObserver.isSelecting;
+    const enabled = !tableObserver?.isSelecting;
     menu.classList.toggle(
-      'table-cell-action-button-container--active',
+      "table-cell-action-button-container--active",
       enabled,
     );
     menu.classList.toggle(
-      'table-cell-action-button-container--inactive',
+      "table-cell-action-button-container--inactive",
       !enabled,
     );
     if (enabled) {
@@ -818,10 +672,10 @@ function TableCellActionMenuContainer({
       ),
       editor.registerRootListener((rootElement, prevRootElement) => {
         if (prevRootElement) {
-          prevRootElement.removeEventListener('pointerup', delayedCallback);
+          prevRootElement.removeEventListener("pointerup", delayedCallback);
         }
         if (rootElement) {
-          rootElement.addEventListener('pointerup', delayedCallback);
+          rootElement.addEventListener("pointerup", delayedCallback);
           delayedCallback();
         }
       }),
@@ -868,9 +722,9 @@ function TableCellActionMenuContainer({
 }
 
 export default function TableActionMenuPlugin({
-  anchorElem = document.body,
-  cellMerge = false,
-}: {
+                                                anchorElem = document.body,
+                                                cellMerge = false,
+                                              }: {
   anchorElem?: HTMLElement;
   cellMerge?: boolean;
 }): null | ReactPortal {

@@ -6,14 +6,12 @@
  *
  */
 
-import type {JSX} from 'react';
+import type { JSX } from "react";
+import { useCallback, useMemo, useState } from "react";
 
-import {$isLinkNode, TOGGLE_LINK_COMMAND} from '@lexical/link';
-import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {
-  LexicalContextMenuPlugin,
-  MenuOption,
-} from '@lexical/react/LexicalContextMenuPlugin';
+import { $isLinkNode, TOGGLE_LINK_COMMAND } from "@lexical/link";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { LexicalContextMenuPlugin, MenuOption } from "@lexical/react/LexicalContextMenuPlugin";
 import {
   $getNearestNodeFromDOMNode,
   $getSelection,
@@ -24,27 +22,25 @@ import {
   CUT_COMMAND,
   type LexicalNode,
   PASTE_COMMAND,
-} from 'lexical';
-import {useCallback, useMemo} from 'react';
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
+} from "lexical";
+import * as ReactDOM from "react-dom";
 
 function ContextMenuItem({
-  index,
-  isSelected,
-  onClick,
-  onMouseEnter,
-  option,
-}: {
+                           index,
+                           isSelected,
+                           onClick,
+                           onMouseEnter,
+                           option,
+                         }: {
   index: number;
   isSelected: boolean;
   onClick: () => void;
   onMouseEnter: () => void;
   option: ContextMenuOption;
 }) {
-  let className = 'item';
+  let className = "item";
   if (isSelected) {
-    className += ' selected';
+    className += " selected";
   }
   return (
     <li
@@ -54,7 +50,7 @@ function ContextMenuItem({
       ref={option.setRefElement}
       role="option"
       aria-selected={isSelected}
-      id={'typeahead-item-' + index}
+      id={"typeahead-item-" + index}
       onMouseEnter={onMouseEnter}
       onClick={onClick}>
       <span className="text">{option.title}</span>
@@ -63,11 +59,11 @@ function ContextMenuItem({
 }
 
 function ContextMenu({
-  options,
-  selectedItemIndex,
-  onOptionClick,
-  onOptionMouseEnter,
-}: {
+                       options,
+                       selectedItemIndex,
+                       onOptionClick,
+                       onOptionMouseEnter,
+                     }: {
   selectedItemIndex: number | null;
   onOptionClick: (option: ContextMenuOption, index: number) => void;
   onOptionMouseEnter: (index: number) => void;
@@ -94,6 +90,7 @@ function ContextMenu({
 export class ContextMenuOption extends MenuOption {
   title: string;
   onSelect: (targetNode: LexicalNode | null) => void;
+
   constructor(
     title: string,
     options: {
@@ -131,10 +128,10 @@ export default function ContextMenuPlugin(): JSX.Element {
 
             const permission = await navigator.permissions.query({
               // @ts-expect-error These types are incorrect.
-              name: 'clipboard-read',
+              name: "clipboard-read",
             });
-            if (permission.state === 'denied') {
-              alert('Not allowed to paste from clipboard.');
+            if (permission.state === "denied") {
+              alert("Not allowed to paste from clipboard.");
               return;
             }
 
@@ -143,7 +140,7 @@ export default function ContextMenuPlugin(): JSX.Element {
               data.setData(type, dataString);
             }
 
-            const event = new ClipboardEvent('paste', {
+            const event = new ClipboardEvent("paste", {
               clipboardData: data,
             });
 
@@ -156,19 +153,19 @@ export default function ContextMenuPlugin(): JSX.Element {
           navigator.clipboard.read().then(async function (...args) {
             const permission = await navigator.permissions.query({
               // @ts-expect-error These types are incorrect.
-              name: 'clipboard-read',
+              name: "clipboard-read",
             });
 
-            if (permission.state === 'denied') {
-              alert('Not allowed to paste from clipboard.');
+            if (permission.state === "denied") {
+              alert("Not allowed to paste from clipboard.");
               return;
             }
 
             const data = new DataTransfer();
             const items = await navigator.clipboard.readText();
-            data.setData('text/plain', items);
+            data.setData("text/plain", items);
 
-            const event = new ClipboardEvent('paste', {
+            const event = new ClipboardEvent("paste", {
               clipboardData: data,
             });
             editor.dispatchCommand(PASTE_COMMAND, event);
@@ -198,7 +195,7 @@ export default function ContextMenuPlugin(): JSX.Element {
     ];
   }, [editor]);
 
-  const [options, setOptions] = React.useState(defaultOptions);
+  const [options, setOptions] = useState(defaultOptions);
 
   const onSelectOption = useCallback(
     (
@@ -248,32 +245,32 @@ export default function ContextMenuPlugin(): JSX.Element {
           selectOptionAndCleanUp,
           setHighlightedIndex,
         },
-        {setMenuRef},
+        { setMenuRef },
       ) =>
         anchorElementRef.current
           ? ReactDOM.createPortal(
-              <div
-                className="typeahead-popover auto-embed-menu"
-                style={{
-                  marginLeft: anchorElementRef.current.style.width,
-                  userSelect: 'none',
-                  width: 200,
+            <div
+              className="typeahead-popover auto-embed-menu"
+              style={{
+                marginLeft: anchorElementRef.current.style.width,
+                userSelect: "none",
+                width: 200,
+              }}
+              ref={setMenuRef}>
+              <ContextMenu
+                options={options}
+                selectedItemIndex={selectedIndex}
+                onOptionClick={(option: ContextMenuOption, index: number) => {
+                  setHighlightedIndex(index);
+                  selectOptionAndCleanUp(option);
                 }}
-                ref={setMenuRef}>
-                <ContextMenu
-                  options={options}
-                  selectedItemIndex={selectedIndex}
-                  onOptionClick={(option: ContextMenuOption, index: number) => {
-                    setHighlightedIndex(index);
-                    selectOptionAndCleanUp(option);
-                  }}
-                  onOptionMouseEnter={(index: number) => {
-                    setHighlightedIndex(index);
-                  }}
-                />
-              </div>,
-              anchorElementRef.current,
-            )
+                onOptionMouseEnter={(index: number) => {
+                  setHighlightedIndex(index);
+                }}
+              />
+            </div>,
+            anchorElementRef.current,
+          )
           : null
       }
     />

@@ -22,7 +22,6 @@ import {
   SELECTION_CHANGE_COMMAND,
 } from "lexical";
 import type { JSX } from "react";
-import * as React from "react";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 
 import "./ImageNode.css";
@@ -47,7 +46,7 @@ import { $isImageNode } from "./ImageNode";
 const imageCache = new Set();
 
 export const RIGHT_CLICK_IMAGE_COMMAND: LexicalCommand<MouseEvent> =
-  createCommand('RIGHT_CLICK_IMAGE_COMMAND');
+  createCommand("RIGHT_CLICK_IMAGE_COMMAND");
 
 function useSuspenseImage(src: string) {
   if (!imageCache.has(src)) {
@@ -66,26 +65,26 @@ function useSuspenseImage(src: string) {
 }
 
 function isSVG(src: string): boolean {
-  return src.toLowerCase().endsWith('.svg');
+  return src.toLowerCase().endsWith(".svg");
 }
 
 function LazyImage({
-  altText,
-  className,
-  imageRef,
-  src,
-  width,
-  height,
-  maxWidth,
-  onError,
-}: {
+                     altText,
+                     className,
+                     imageRef,
+                     src,
+                     width,
+                     height,
+                     maxWidth,
+                     onError,
+                   }: {
   altText: string;
   className: string | null;
-  height: 'inherit' | number;
-  imageRef: {current: null | HTMLImageElement};
+  height: "inherit" | number;
+  imageRef: { current: null | HTMLImageElement };
   maxWidth: number;
   src: string;
-  width: 'inherit' | number;
+  width: "inherit" | number;
   onError: () => void;
 }): JSX.Element {
   useSuspenseImage(src);
@@ -98,7 +97,7 @@ function LazyImage({
   // Set initial dimensions for SVG images
   useEffect(() => {
     if (imageRef.current && isSVGImage) {
-      const {naturalWidth, naturalHeight} = imageRef.current;
+      const { naturalWidth, naturalHeight } = imageRef.current;
       setDimensions({
         height: naturalHeight,
         width: naturalWidth,
@@ -197,13 +196,13 @@ export default function ImageComponent({
 }: {
   altText: string;
   caption: LexicalEditor;
-  height: 'inherit' | number;
+  height: "inherit" | number;
   maxWidth: number;
   nodeKey: NodeKey;
   resizable: boolean;
   showCaption: boolean;
   src: string;
-  width: 'inherit' | number;
+  width: "inherit" | number;
   captionsEnabled: boolean;
 }): JSX.Element {
   const imageRef = useRef<null | HTMLImageElement>(null);
@@ -295,13 +294,13 @@ export default function ImageComponent({
         const latestSelection = $getSelection();
         const domElement = event.target as HTMLElement;
         if (
-          domElement.tagName === 'IMG' &&
+          domElement.tagName === "IMG" &&
           $isRangeSelection(latestSelection) &&
           latestSelection.getNodes().length === 1
         ) {
           editor.dispatchCommand(
             RIGHT_CLICK_IMAGE_COMMAND,
-            event as MouseEvent,
+            event,
           );
         }
       });
@@ -312,7 +311,7 @@ export default function ImageComponent({
   useEffect(() => {
     const rootElement = editor.getRootElement();
     const unregister = mergeRegister(
-      editor.registerUpdateListener(({editorState}) => {
+      editor.registerUpdateListener(({ editorState }) => {
         const updatedSelection = editorState.read(() => $getSelection());
         if ($isNodeSelection(updatedSelection)) {
           setSelection(updatedSelection);
@@ -359,11 +358,11 @@ export default function ImageComponent({
       ),
     );
 
-    rootElement?.addEventListener('contextmenu', onRightClick);
+    rootElement?.addEventListener("contextmenu", onRightClick);
 
     return () => {
       unregister();
-      rootElement?.removeEventListener('contextmenu', onRightClick);
+      rootElement?.removeEventListener("contextmenu", onRightClick);
     };
   }, [
     clearSelection,
@@ -388,8 +387,8 @@ export default function ImageComponent({
   };
 
   const onResizeEnd = (
-    nextWidth: 'inherit' | number,
-    nextHeight: 'inherit' | number,
+    nextWidth: "inherit" | number,
+    nextHeight: "inherit" | number,
   ) => {
     // Delay hiding the resize bars for click case
     setTimeout(() => {
@@ -408,7 +407,7 @@ export default function ImageComponent({
     setIsResizing(true);
   };
 
-  const {historyState} = useSharedHistoryContext();
+  const { historyState } = useSharedHistoryContext();
 
   const draggable = isSelected && $isNodeSelection(selection) && !isResizing;
   const isFocused = (isSelected || isResizing) && isEditable;
@@ -422,7 +421,7 @@ export default function ImageComponent({
             <LazyImage
               className={
                 isFocused
-                  ? `focused ${$isNodeSelection(selection) ? 'draggable' : ''}`
+                  ? `focused ${$isNodeSelection(selection) ? "draggable" : ""}`
                   : null
               }
               src={src}
@@ -441,7 +440,7 @@ export default function ImageComponent({
             <LexicalNestedComposer initialEditor={caption}>
               <AutoFocusPlugin />
               <LinkPlugin />
-                <HistoryPlugin externalHistoryState={historyState} />
+              <HistoryPlugin externalHistoryState={historyState} />
               <RichTextPlugin
                 contentEditable={
                   <ContentEditable

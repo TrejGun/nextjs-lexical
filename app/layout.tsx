@@ -10,7 +10,7 @@ export default function RootLayout(props: PropsWithChildren) {
   const { children } = props;
   return (
     <html lang="en">
-      <body>{children}</body>
+    <body>{children}</body>
     </html>
   );
 }

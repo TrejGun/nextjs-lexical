@@ -6,14 +6,9 @@
  *
  */
 
-import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {
-  $getSelection,
-  $isRangeSelection,
-  $setSelection,
-  FOCUS_COMMAND,
-} from 'lexical';
-import {useEffect} from 'react';
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { $getSelection, $isRangeSelection, $setSelection, FOCUS_COMMAND } from "lexical";
+import { useEffect } from "react";
 
 const COMMAND_PRIORITY_LOW = 1;
 const TAB_TO_FOCUS_INTERVAL = 100;
@@ -23,10 +18,10 @@ let hasRegisteredKeyDownListener = false;
 
 function registerKeyTimeStampTracker() {
   window.addEventListener(
-    'keydown',
+    "keydown",
     (event: KeyboardEvent) => {
       // Tab
-      if (event.key === 'Tab') {
+      if (event.key === "Tab") {
         lastTabKeyDownTimestamp = event.timeStamp;
       }
     },
