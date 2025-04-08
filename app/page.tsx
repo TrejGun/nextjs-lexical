@@ -1,5 +1,7 @@
-import { Editor } from "./editor";
+import Wrapper from "./wrapper";
 
 export default function Home() {
-  return <Editor />;
+  return (
+    <Wrapper />
+  );
 }

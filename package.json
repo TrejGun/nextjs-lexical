@@ -27,7 +27,12 @@
     "mdi-material-ui": "7.9.4",
     "next": "15.2.4",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "y-websocket": "1.5.4",
+    "@lexical/file": "0.29.0",
+    "@excalidraw/excalidraw": "0.18.0",
+    "yjs": "13.6.24",
+    "katex": "0.16.10"
   },
   "devDependencies": {
     "@ethberry/eslint-config": "5.0.5",
