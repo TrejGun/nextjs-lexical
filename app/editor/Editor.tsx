@@ -8,7 +8,6 @@
 
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
-
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { CheckListPlugin } from "@lexical/react/LexicalCheckListPlugin";
 import { ClearEditorPlugin } from "@lexical/react/LexicalClearEditorPlugin";
@@ -23,8 +22,8 @@ import { TabIndentationPlugin } from "@lexical/react/LexicalTabIndentationPlugin
 import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
 import { useLexicalEditable } from "@lexical/react/useLexicalEditable";
 import { CAN_USE_DOM } from "@lexical/utils";
+
 import { useSharedHistoryContext } from "./context/SharedHistoryContext";
-import AutoLinkPlugin from "./plugins/AutoLinkPlugin";
 import CodeActionMenuPlugin from "./plugins/CodeActionMenuPlugin";
 import CodeHighlightPlugin from "./plugins/CodeHighlightPlugin";
 import ComponentPickerPlugin from "./plugins/ComponentPickerPlugin";
@@ -94,7 +93,6 @@ export default function Editor(): JSX.Element {
         <AutoFocusPlugin />
         <ClearEditorPlugin />
         <ComponentPickerPlugin />
-        <AutoLinkPlugin />
         <HistoryPlugin externalHistoryState={historyState} />
         <RichTextPlugin
           contentEditable={

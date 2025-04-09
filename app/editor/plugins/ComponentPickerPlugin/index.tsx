@@ -145,7 +145,7 @@ function getBaseOptions(editor: LexicalEditor, showModal: ShowModal) {
           }
         }),
     }),
-    ...([1, 2, 3] as const).map(
+    ...([1, 2, 3, 4, 5, 6] as const).map(
       (n) =>
         new ComponentPickerOption(`Heading ${n}`, {
           icon: <i className={`icon h${n}`} />,

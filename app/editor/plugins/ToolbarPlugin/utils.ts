@@ -96,51 +96,6 @@ export const calculateNextFontSize = (
   return updatedFontSize;
 };
 
-/**
- * Patches the selection with the updated font size.
- */
-export const updateFontSizeInSelection = (
-  editor: LexicalEditor,
-  newFontSize: string | null,
-  updateType: UpdateFontSizeType | null,
-) => {
-  const getNextFontSize = (prevFontSize: string | null): string => {
-    if (!prevFontSize) {
-      prevFontSize = `${DEFAULT_FONT_SIZE}px`;
-    }
-    prevFontSize = prevFontSize.slice(0, -2);
-    const nextFontSize = calculateNextFontSize(
-      Number(prevFontSize),
-      updateType,
-    );
-    return `${nextFontSize}px`;
-  };
-
-  editor.update(() => {
-    if (editor.isEditable()) {
-      const selection = $getSelection();
-      if (selection !== null) {
-        $patchStyleText(selection, {
-          "font-size": newFontSize || getNextFontSize,
-        });
-      }
-    }
-  });
-};
-
-export const updateFontSize = (
-  editor: LexicalEditor,
-  updateType: UpdateFontSizeType,
-  inputValue: string,
-) => {
-  if (inputValue !== "") {
-    const nextFontSize = calculateNextFontSize(Number(inputValue), updateType);
-    updateFontSizeInSelection(editor, String(nextFontSize) + "px", null);
-  } else {
-    updateFontSizeInSelection(editor, null, updateType);
-  }
-};
-
 export const formatParagraph = (editor: LexicalEditor) => {
   editor.update(() => {
     const selection = $getSelection();

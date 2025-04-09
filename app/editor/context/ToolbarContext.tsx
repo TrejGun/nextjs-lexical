@@ -7,7 +7,7 @@
  */
 
 import type { JSX } from "react";
-import React, { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, ReactNode, useCallback, useContext, useMemo, useState } from "react";
 import { ElementFormatType } from "lexical";
 
 export const MIN_ALLOWED_FONT_SIZE = 8;
@@ -42,12 +42,6 @@ const INITIAL_TOOLBAR_STATE = {
   canUndo: false,
   codeLanguage: "",
   elementFormat: "left" as ElementFormatType,
-  fontColor: "#000",
-  fontFamily: "Arial",
-  // Current font size in px
-  fontSize: `${DEFAULT_FONT_SIZE}px`,
-  // Font size input value - for controlled input
-  fontSizeInputValue: `${DEFAULT_FONT_SIZE}`,
   isBold: false,
   isCode: false,
   isHighlight: false,
@@ -82,7 +76,6 @@ export const ToolbarContext = ({
   children: ReactNode;
 }): JSX.Element => {
   const [toolbarState, setToolbarState] = useState(INITIAL_TOOLBAR_STATE);
-  const selectionFontSize = toolbarState.fontSize;
 
   const updateToolbarState = useCallback(
     <Key extends ToolbarStateKey>(key: Key, value: ToolbarStateValue<Key>) => {
@@ -93,10 +86,6 @@ export const ToolbarContext = ({
     },
     [],
   );
-
-  useEffect(() => {
-    updateToolbarState("fontSizeInputValue", selectionFontSize.slice(0, -2));
-  }, [selectionFontSize, updateToolbarState]);
 
   const contextValue = useMemo(() => {
     return {
