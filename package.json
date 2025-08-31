@@ -28,7 +28,7 @@
     "lexical": "0.33.1",
     "lodash-es": "4.17.21",
     "mdi-material-ui": "7.9.4",
-    "next": "15.4.5",
+    "next": "15.4.7",
     "react": "19.1.1",
     "react-dom": "19.1.1"
   },
