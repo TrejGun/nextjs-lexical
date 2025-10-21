@@ -1,4 +1,8 @@
 {
-  "baseBranches": ["master"],
-  "extends": ["github>trejgun/renovate-config"]
+  "baseBranchPatterns": [
+    "master"
+  ],
+  "extends": [
+    "github>trejgun/renovate-config"
+  ]
 }
