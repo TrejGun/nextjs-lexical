@@ -6,7 +6,12 @@
  *
  */
 
-import type { BaseSelection, LexicalCommand, LexicalEditor, NodeKey } from "lexical";
+import type {
+  BaseSelection,
+  LexicalCommand,
+  LexicalEditor,
+  NodeKey,
+} from "lexical";
 import {
   $getNodeByKey,
   $getSelection,
@@ -21,8 +26,14 @@ import {
   KEY_ESCAPE_COMMAND,
   SELECTION_CHANGE_COMMAND,
 } from "lexical";
-import type { JSX } from "react";
-import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type JSX,
+} from "react";
 
 import "./ImageNode.css";
 
@@ -69,15 +80,15 @@ function isSVG(src: string): boolean {
 }
 
 function LazyImage({
-                     altText,
-                     className,
-                     imageRef,
-                     src,
-                     width,
-                     height,
-                     maxWidth,
-                     onError,
-                   }: {
+  altText,
+  className,
+  imageRef,
+  src,
+  width,
+  height,
+  maxWidth,
+  onError,
+}: {
   altText: string;
   className: string | null;
   height: "inherit" | number;
@@ -298,10 +309,7 @@ export default function ImageComponent({
           $isRangeSelection(latestSelection) &&
           latestSelection.getNodes().length === 1
         ) {
-          editor.dispatchCommand(
-            RIGHT_CLICK_IMAGE_COMMAND,
-            event,
-          );
+          editor.dispatchCommand(RIGHT_CLICK_IMAGE_COMMAND, event);
         }
       });
     },

@@ -39,6 +39,7 @@ import TableCellResizer from "./plugins/TableCellResizer";
 import TableHoverActionsPlugin from "./plugins/TableHoverActionsPlugin";
 import ToolbarPlugin from "./plugins/ToolbarPlugin";
 import ContentEditable from "./ui/ContentEditable";
+import { VideoPlugin } from "./plugins/VideoPlugin";
 
 export default function Editor(): JSX.Element {
   const { historyState } = useSharedHistoryContext();
@@ -87,8 +88,7 @@ export default function Editor(): JSX.Element {
         editor={activeEditor}
         setIsLinkEditMode={setIsLinkEditMode}
       />
-      <div
-        className={`editor-container`}>
+      <div className={`editor-container`}>
         <MaxLengthPlugin maxLength={30} />
         <AutoFocusPlugin />
         <ClearEditorPlugin />
@@ -115,6 +115,7 @@ export default function Editor(): JSX.Element {
         />
         <TableCellResizer />
         <ImagesPlugin />
+        <VideoPlugin />
         <LinkPlugin />
         <ClickableLinkPlugin disabled={isEditable} />
         <HorizontalRulePlugin />

@@ -8,7 +8,6 @@
 
 import type { JSX } from "react";
 import { useEffect, useRef, useState } from "react";
-
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $wrapNodeInElement, mergeRegister } from "@lexical/utils";
 import {
@@ -32,19 +31,24 @@ import {
   LexicalEditor,
 } from "lexical";
 
-import { $createImageNode, $isImageNode, ImageNode, ImagePayload } from "../../nodes/ImageNode";
+import {
+  $createImageNode,
+  $isImageNode,
+  ImageNode,
+  IImagePayload,
+} from "../../nodes/ImageNode";
 import Button from "../../ui/Button";
 import { DialogActions, DialogButtonsList } from "../../ui/Dialog";
 import TextInput from "../../ui/TextInput";
 
-export type InsertImagePayload = Readonly<ImagePayload>;
+export type InsertImagePayload = Readonly<IImagePayload>;
 
 export const INSERT_IMAGE_COMMAND: LexicalCommand<InsertImagePayload> =
   createCommand("INSERT_IMAGE_COMMAND");
 
 export function InsertImageUriDialogBody({
-                                           onClick,
-                                         }: {
+  onClick,
+}: {
   onClick: (payload: InsertImagePayload) => void;
 }) {
   const [src, setSrc] = useState("");
@@ -72,7 +76,8 @@ export function InsertImageUriDialogBody({
         <Button
           data-test-id="image-modal-confirm-btn"
           disabled={isDisabled}
-          onClick={() => onClick({ altText, src })}>
+          onClick={() => onClick({ altText, src })}
+        >
           Confirm
         </Button>
       </DialogActions>
@@ -81,9 +86,9 @@ export function InsertImageUriDialogBody({
 }
 
 export function InsertImageDialog({
-                                    activeEditor,
-                                    onClose,
-                                  }: {
+  activeEditor,
+  onClose,
+}: {
   activeEditor: LexicalEditor;
   onClose: () => void;
 }): JSX.Element {
@@ -112,7 +117,8 @@ export function InsertImageDialog({
         <DialogButtonsList>
           <Button
             data-test-id="image-modal-option-url"
-            onClick={() => setMode("url")}>
+            onClick={() => setMode("url")}
+          >
             URL
           </Button>
         </DialogButtonsList>
@@ -123,8 +129,8 @@ export function InsertImageDialog({
 }
 
 export default function ImagesPlugin({
-                                       captionsEnabled,
-                                     }: {
+  captionsEnabled,
+}: {
   captionsEnabled?: boolean;
 }): JSX.Element | null {
   const [editor] = useLexicalComposerContext();
