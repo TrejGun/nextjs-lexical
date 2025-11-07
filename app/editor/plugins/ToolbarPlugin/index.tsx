@@ -255,114 +255,117 @@ export default function ToolbarPlugin({
   const { toolbarState, updateToolbarState } = useToolbarState();
 
   const $updateToolbar = useCallback(() => {
-    const selection = $getSelection();
-    if ($isRangeSelection(selection)) {
-      if (activeEditor !== editor && $isEditorIsNestedEditor(activeEditor)) {
-        const rootElement = activeEditor.getRootElement();
-        updateToolbarState(
-          "isImageCaption",
-          !!rootElement?.parentElement?.classList.contains(
-            "image-caption-container",
-          ),
-        );
-      } else {
-        updateToolbarState("isImageCaption", false);
-      }
-
-      const anchorNode = selection.anchor.getNode();
-      let element =
-        anchorNode.getKey() === "root"
-          ? anchorNode
-          : $findMatchingParent(anchorNode, (e) => {
-              const parent = e.getParent();
-              return parent !== null && $isRootOrShadowRoot(parent);
-            });
-
-      if (element === null) {
-        element = anchorNode.getTopLevelElementOrThrow();
-      }
-
-      const elementKey = element.getKey();
-      const elementDOM = activeEditor.getElementByKey(elementKey);
-
-      updateToolbarState("isRTL", $isParentElementRTL(selection));
-
-      // Update links
-      const node = getSelectedNode(selection);
-      const parent = node.getParent();
-      const isLink = $isLinkNode(parent) || $isLinkNode(node);
-      updateToolbarState("isLink", isLink);
-
-      const tableNode = $findMatchingParent(node, $isTableNode);
-      if ($isTableNode(tableNode)) {
-        updateToolbarState("rootType", "table");
-      } else {
-        updateToolbarState("rootType", "root");
-      }
-
-      if (elementDOM !== null) {
-        setSelectedElementKey(elementKey);
-        if ($isListNode(element)) {
-          const parentList = $getNearestNodeOfType<ListNode>(
-            anchorNode,
-            ListNode,
+    activeEditor.read(() => {
+      const selection = $getSelection();
+      if ($isRangeSelection(selection)) {
+        if (activeEditor !== editor && $isEditorIsNestedEditor(activeEditor)) {
+          const rootElement = activeEditor.getRootElement();
+          updateToolbarState(
+            "isImageCaption",
+            !!rootElement?.parentElement?.classList.contains(
+              "image-caption-container",
+            ),
           );
-          const type = parentList
-            ? parentList.getListType()
-            : element.getListType();
-
-          updateToolbarState("blockType", type);
         } else {
-          const type = $isHeadingNode(element)
-            ? element.getTag()
-            : element.getType();
-          if (type in blockTypeToBlockName) {
-            updateToolbarState(
-              "blockType",
-              type as keyof typeof blockTypeToBlockName,
+          updateToolbarState("isImageCaption", false);
+        }
+
+        const anchorNode = selection.anchor.getNode();
+        let element =
+          anchorNode.getKey() === "root"
+            ? anchorNode
+            : $findMatchingParent(anchorNode, (e) => {
+                const parent = e.getParent();
+                return parent !== null && $isRootOrShadowRoot(parent);
+              });
+
+        if (element === null) {
+          element = anchorNode.getTopLevelElementOrThrow();
+        }
+
+        const elementKey = element.getKey();
+        const elementDOM = activeEditor.getElementByKey(elementKey);
+
+        updateToolbarState("isRTL", $isParentElementRTL(selection));
+
+        // Update links
+        const node = getSelectedNode(selection);
+        const parent = node.getParent();
+        const isLink = $isLinkNode(parent) || $isLinkNode(node);
+        updateToolbarState("isLink", isLink);
+
+        const tableNode = $findMatchingParent(node, $isTableNode);
+        if ($isTableNode(tableNode)) {
+          updateToolbarState("rootType", "table");
+        } else {
+          updateToolbarState("rootType", "root");
+        }
+
+        if (elementDOM !== null) {
+          setSelectedElementKey(elementKey);
+          if ($isListNode(element)) {
+            const parentList = $getNearestNodeOfType<ListNode>(
+              anchorNode,
+              ListNode,
             );
-          }
-          if ($isCodeNode(element)) {
-            const language = element.getLanguage()!;
-            updateToolbarState(
-              "codeLanguage",
-              language ? CODE_LANGUAGE_MAP[language] || language : "",
-            );
-            return;
+            const type = parentList
+              ? parentList.getListType()
+              : element.getListType();
+
+            updateToolbarState("blockType", type);
+          } else {
+            const type = $isHeadingNode(element)
+              ? element.getTag()
+              : element.getType();
+            if (type in blockTypeToBlockName) {
+              updateToolbarState(
+                "blockType",
+                type as keyof typeof blockTypeToBlockName,
+              );
+            }
+            if ($isCodeNode(element)) {
+              const language = element.getLanguage()!;
+              updateToolbarState(
+                "codeLanguage",
+                language ? CODE_LANGUAGE_MAP[language] || language : "",
+              );
+              return;
+            }
           }
         }
-      }
-      let matchingParent;
-      if ($isLinkNode(parent)) {
-        // If node is a link, we need to fetch the parent paragraph node to set format
-        matchingParent = $findMatchingParent(
-          node,
-          (parentNode) => $isElementNode(parentNode) && !parentNode.isInline(),
+        let matchingParent;
+        if ($isLinkNode(parent)) {
+          // If node is a link, we need to fetch the parent paragraph node to set format
+          matchingParent = $findMatchingParent(
+            node,
+            (parentNode) =>
+              $isElementNode(parentNode) && !parentNode.isInline(),
+          );
+        }
+
+        // If matchingParent is a valid node, pass it's format type
+        updateToolbarState(
+          "elementFormat",
+          $isElementNode(matchingParent)
+            ? matchingParent.getFormatType()
+            : $isElementNode(node)
+              ? node.getFormatType()
+              : parent?.getFormatType() || "left",
         );
       }
-
-      // If matchingParent is a valid node, pass it's format type
-      updateToolbarState(
-        "elementFormat",
-        $isElementNode(matchingParent)
-          ? matchingParent.getFormatType()
-          : $isElementNode(node)
-            ? node.getFormatType()
-            : parent?.getFormatType() || "left",
-      );
-    }
-    if ($isRangeSelection(selection) || $isTableSelection(selection)) {
-      // Update text format
-      updateToolbarState("isBold", selection.hasFormat("bold"));
-      updateToolbarState("isItalic", selection.hasFormat("italic"));
-      updateToolbarState("isUnderline", selection.hasFormat("underline"));
-      updateToolbarState(
-        "isStrikethrough",
-        selection.hasFormat("strikethrough"),
-      );
-      updateToolbarState("isHighlight", selection.hasFormat("highlight"));
-      updateToolbarState("isCode", selection.hasFormat("code"));
-    }
+      if ($isRangeSelection(selection) || $isTableSelection(selection)) {
+        // Update text format
+        updateToolbarState("isBold", selection.hasFormat("bold"));
+        updateToolbarState("isItalic", selection.hasFormat("italic"));
+        updateToolbarState("isUnderline", selection.hasFormat("underline"));
+        updateToolbarState(
+          "isStrikethrough",
+          selection.hasFormat("strikethrough"),
+        );
+        updateToolbarState("isHighlight", selection.hasFormat("highlight"));
+        updateToolbarState("isCode", selection.hasFormat("code"));
+      }
+    });
   }, [activeEditor, editor, updateToolbarState]);
 
   useEffect(() => {
