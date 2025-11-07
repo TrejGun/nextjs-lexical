@@ -17,6 +17,7 @@ import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
 
 import { ImageNode } from "./ImageNode";
 import { InlineImageNode } from "./InlineImageNode/InlineImageNode";
+import { VideoNode } from "./Video/VideoNode";
 
 const PlaygroundNodes: Array<Klass<LexicalNode>> = [
   HeadingNode,
@@ -34,6 +35,7 @@ const PlaygroundNodes: Array<Klass<LexicalNode>> = [
   ImageNode,
   InlineImageNode,
   HorizontalRuleNode,
+  VideoNode,
 ];
 
 export default PlaygroundNodes;

@@ -1,5 +1,7 @@
 import {
   DecoratorNode,
+  DOMConversionMap,
+  DOMConversionOutput,
   type EditorConfig,
   type LexicalEditor,
   type NodeKey,
@@ -8,7 +10,11 @@ import {
 } from "lexical";
 import React from "react";
 
-import { ParsedVideo, VideoProvider } from "../../utils/parseVideoUrl";
+import {
+  ParsedVideo,
+  parseVideoUrl,
+  VideoProvider,
+} from "../../utils/parseVideoUrl";
 import { IVideoNodeProps, VideoComponent } from "./VideoComponent";
 
 export type SerializedVideoNode = Spread<
@@ -72,6 +78,46 @@ export class VideoNode extends DecoratorNode<React.JSX.Element> {
       embedUrl: this.__embedUrl,
       startAt: this.__startAt ?? null,
       originalUrl: this.__originalUrl,
+    };
+  }
+
+  static importDOM(): DOMConversionMap {
+    return {
+      iframe: (domNode) => {
+        const el = domNode as HTMLIFrameElement;
+        if (!(el instanceof HTMLIFrameElement)) return null;
+
+        const src = el.getAttribute("src") || "";
+        const parsed = parseVideoUrl(src);
+        if (!parsed) return null;
+
+        return {
+          priority: 2,
+          conversion: (): DOMConversionOutput => {
+            return { node: $createVideoNode(parsed) };
+          },
+        };
+      },
+
+      div: (domNode) => {
+        const el = domNode as HTMLDivElement;
+        if (!(el instanceof HTMLDivElement)) return null;
+
+        if (!el.classList.contains("lexical-video")) return null;
+        const iframe = el.querySelector("iframe");
+        if (!(iframe instanceof HTMLIFrameElement)) return null;
+
+        const src = iframe.getAttribute("src") || "";
+        const parsed = parseVideoUrl(src);
+        if (!parsed) return null;
+
+        return {
+          priority: 2,
+          conversion: (): DOMConversionOutput => {
+            return { node: $createVideoNode(parsed) };
+          },
+        };
+      },
     };
   }
 

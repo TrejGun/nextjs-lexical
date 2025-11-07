@@ -1,16 +1,56 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { useEffect } from "react";
+import { type JSX, useEffect, useState } from "react";
 import {
   $getSelection,
   $insertNodes,
   COMMAND_PRIORITY_EDITOR,
   COMMAND_PRIORITY_LOW,
+  LexicalEditor,
   PASTE_COMMAND,
 } from "lexical";
 
 import { INSERT_VIDEO_COMMAND } from "../../commands";
 import { parseVideoUrl } from "../../utils/parseVideoUrl";
 import { $createVideoNode } from "../../nodes/Video/VideoNode";
+import { DialogActions } from "../../ui/Dialog";
+import Button from "../../ui/Button";
+import TextInput from "../../ui/TextInput";
+
+export function InsertVideoDialog({
+  activeEditor,
+  onClose,
+}: {
+  activeEditor: LexicalEditor;
+  onClose: () => void;
+}): JSX.Element {
+  const [url, setUrl] = useState("");
+
+  const isDisabled = url === "";
+
+  return (
+    <>
+      <TextInput
+        label="Video URL"
+        placeholder="i.e. https://www.youtube.com"
+        onChange={setUrl}
+        value={url}
+        data-test-id="video-modal-url-input"
+      />
+      <DialogActions>
+        <Button
+          data-test-id="video-modal-confirm-btn"
+          disabled={isDisabled}
+          onClick={() => {
+            activeEditor.dispatchCommand(INSERT_VIDEO_COMMAND, { url });
+            onClose();
+          }}
+        >
+          Confirm
+        </Button>
+      </DialogActions>
+    </>
+  );
+}
 
 export const VideoPlugin = () => {
   const [editor] = useLexicalComposerContext();

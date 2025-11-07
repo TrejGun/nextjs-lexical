@@ -65,7 +65,7 @@ import {
   formatParagraph,
   formatQuote,
 } from "./utils";
-import { INSERT_VIDEO_COMMAND } from "../../commands";
+import { InsertVideoDialog } from "../VideoPlugin";
 
 function getCodeLanguageOptions(): [string, string][] {
   const options: [string, string][] = [];
@@ -637,17 +637,20 @@ export default function ToolbarPlugin({
                 <i className="format image" />
               </button>
               <button
-                type="button"
                 onClick={() => {
-                  const url = window.prompt(
-                    "Вставьте ссылку на YouTube/Vimeo:",
-                  );
-                  if (!url) return;
-
-                  editor.dispatchCommand(INSERT_VIDEO_COMMAND, { url });
+                  showModal("Insert Video", (onClose) => (
+                    <InsertVideoDialog
+                      activeEditor={activeEditor}
+                      onClose={onClose}
+                    />
+                  ));
                 }}
+                className={"toolbar-item spaced"}
+                title="Video"
+                type="button"
+                aria-label="Image"
               >
-                ▶ Insert video
+                <i className="format video" />
               </button>
               <button
                 onClick={() => {
