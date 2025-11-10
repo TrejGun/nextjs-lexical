@@ -22,7 +22,7 @@ function parseTimeToSeconds(raw: string | null): number | undefined {
   if (!raw) {
     return;
   }
-  if (/^d+$/.test(raw)) {
+  if (/^\d+$/.test(raw)) {
     return Number(raw);
   }
   if (raw.includes(":")) {
