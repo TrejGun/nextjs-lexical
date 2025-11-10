@@ -38,7 +38,7 @@ import {
   IImagePayload,
 } from "../../nodes/ImageNode";
 import Button from "../../ui/Button";
-import { DialogActions, DialogButtonsList } from "../../ui/Dialog";
+import { DialogActions } from "../../ui/Dialog";
 import TextInput from "../../ui/TextInput";
 
 export type InsertImagePayload = Readonly<IImagePayload>;
@@ -92,7 +92,6 @@ export function InsertImageDialog({
   activeEditor: LexicalEditor;
   onClose: () => void;
 }): JSX.Element {
-  const [mode, setMode] = useState<null | "url" | "file">(null);
   const hasModifier = useRef(false);
 
   useEffect(() => {
@@ -111,21 +110,7 @@ export function InsertImageDialog({
     onClose();
   };
 
-  return (
-    <>
-      {!mode && (
-        <DialogButtonsList>
-          <Button
-            data-test-id="image-modal-option-url"
-            onClick={() => setMode("url")}
-          >
-            URL
-          </Button>
-        </DialogButtonsList>
-      )}
-      {mode === "url" && <InsertImageUriDialogBody onClick={onClick} />}
-    </>
-  );
+  return <InsertImageUriDialogBody onClick={onClick} />;
 }
 
 export default function ImagesPlugin({
