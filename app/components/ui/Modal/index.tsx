@@ -4,11 +4,11 @@ import { PropsWithChildren } from "react";
 import { Box, Divider, Modal, Typography } from "@mui/material";
 
 export default function ModalWrapper({
-                                       open,
-                                       onClose,
-                                       children,
-                                       title,
-                                     }: PropsWithChildren<{ open: boolean; title: string; onClose: () => void }>) {
+  open,
+  onClose,
+  children,
+  title,
+}: PropsWithChildren<{ open: boolean; title: string; onClose: () => void }>) {
   return (
     <Modal
       open={open}

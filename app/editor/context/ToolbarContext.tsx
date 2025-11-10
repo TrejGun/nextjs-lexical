@@ -7,17 +7,24 @@
  */
 
 import type { JSX } from "react";
-import React, { createContext, ReactNode, useCallback, useContext, useMemo, useState } from "react";
+import React, {
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from "react";
 import { ElementFormatType } from "lexical";
 
 export const MIN_ALLOWED_FONT_SIZE = 8;
 export const MAX_ALLOWED_FONT_SIZE = 72;
 export const DEFAULT_FONT_SIZE = 15;
 
-const rootTypeToRootName = {
-  root: "Root",
-  table: "Table",
-};
+interface IRootTypeToRootName {
+  root: "Root";
+  table: "Table";
+}
 
 export const blockTypeToBlockName = {
   bullet: "Bulleted List",
@@ -51,7 +58,7 @@ const INITIAL_TOOLBAR_STATE = {
   isRTL: false,
   isStrikethrough: false,
   isUnderline: false,
-  rootType: "root" as keyof typeof rootTypeToRootName,
+  rootType: "root" as keyof IRootTypeToRootName,
 };
 
 type ToolbarState = typeof INITIAL_TOOLBAR_STATE;
@@ -60,19 +67,19 @@ type ToolbarState = typeof INITIAL_TOOLBAR_STATE;
 type ToolbarStateKey = keyof ToolbarState;
 type ToolbarStateValue<Key extends ToolbarStateKey> = ToolbarState[Key];
 
-type ContextShape = {
+interface IContextShape {
   toolbarState: ToolbarState;
   updateToolbarState<Key extends ToolbarStateKey>(
     key: Key,
     value: ToolbarStateValue<Key>,
   ): void;
-};
+}
 
-const Context = createContext<ContextShape | undefined>(undefined);
+const Context = createContext<IContextShape | undefined>(undefined);
 
 export const ToolbarContext = ({
-                                 children,
-                               }: {
+  children,
+}: {
   children: ReactNode;
 }): JSX.Element => {
   const [toolbarState, setToolbarState] = useState(INITIAL_TOOLBAR_STATE);

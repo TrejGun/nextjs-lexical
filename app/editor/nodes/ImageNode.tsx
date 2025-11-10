@@ -30,13 +30,12 @@ import {
 } from "lexical";
 import type { JSX } from "react";
 import { lazy } from "react";
-
 import { HashtagNode } from "@lexical/hashtag";
 import { LinkNode } from "@lexical/link";
 
 const ImageComponent = lazy(() => import("./ImageComponent"));
 
-export interface ImagePayload {
+export interface IImagePayload {
   altText: string;
   caption?: LexicalEditor;
   height?: number;
@@ -144,7 +143,8 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
   }
 
   static importJSON(serializedNode: SerializedImageNode): ImageNode {
-    const { altText, height, width, maxWidth, src, showCaption } = serializedNode;
+    const { altText, height, width, maxWidth, src, showCaption } =
+      serializedNode;
     return $createImageNode({
       altText,
       height,
@@ -157,7 +157,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
 
   static importDOM(): DOMConversionMap | null {
     return {
-      img: (node: Node) => ({
+      img: (_node: Node) => ({
         conversion: $convertImageElement,
         priority: 0,
       }),
@@ -255,16 +255,16 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
 }
 
 export function $createImageNode({
-                                   altText,
-                                   height,
-                                   maxWidth = 500,
-                                   captionsEnabled,
-                                   src,
-                                   width,
-                                   showCaption,
-                                   caption,
-                                   key,
-                                 }: ImagePayload): ImageNode {
+  altText,
+  height,
+  maxWidth = 500,
+  captionsEnabled,
+  src,
+  width,
+  showCaption,
+  caption,
+  key,
+}: IImagePayload): ImageNode {
   return $applyNodeReplacement(
     new ImageNode(
       src,
