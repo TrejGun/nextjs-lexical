@@ -34,11 +34,11 @@
   },
   "devDependencies": {
     "@ethberry/eslint-config": "5.0.9",
-    "@types/node": "22.19.0",
-    "@types/react": "19.2.2",
-    "@types/react-dom": "19.2.2",
+    "@types/node": "22.19.1",
+    "@types/react": "19.2.6",
+    "@types/react-dom": "19.2.3",
     "husky": "9.1.7",
-    "lint-staged": "16.2.6",
+    "lint-staged": "16.2.7",
     "typescript": "5.9.3"
   },
   "engines": {
